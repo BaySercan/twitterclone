@@ -1,0 +1,78 @@
+{% extends "network/layout.html" %}
+{% load static %}
+{% block title %}{{ profileUser.username }} Profile {% endblock %}
+{% block head %}
+    <script src="{% static 'network/profile.js' %}"></script>
+    <script src="{% static 'network/edit.js' %}"></script>
+    <script src="{% static 'network/util.js' %}"></script>
+{% endblock %}
+{% block body %}
+    <div class="card text-center mb-3 mt-3">
+        <div class="card-header">
+        <h1>{{ profileUser.username }}</h1>
+        </div>
+        <div class="card-body">
+        <h5 class="card-title">Hi everyone! I use Network</h5>
+        <p class="card-text">If you like my posts and wanna give me a hand for support just follow me by clicking the button below.</p>
+        <p class="card-text" style="display: inline;"><span style="font-weight: 600;" id="following">{{ following }}</span> Following</p>
+        <p class="card-text ml-2" style="display: inline;"><span style="font-weight: 600;" id="followers">{{ userFollowers }}</span> Followers</p>
+        {% if user.is_authenticated and user.id != profileUser.id %}
+            {% if is_following %}
+            <center><button class="btn btn-outline-primary mt-3 follow" style="display: block; width: 120px;" data-profiluserid="{{ profileUser.id }}">Unfollow</button></center>
+            {% else %}
+            <center><button class="btn btn-primary mt-3 follow" style="display: block; width: 120px;" data-profiluserid="{{ profileUser.id }}" >Follow</button></center>
+            {% endif %}
+        {% else %}
+            <input type="hidden" class="follow">
+        {% endif %}
+        {% if not user.is_authenticated %}
+            <div class="mt-3">
+            You want to follow <span style="font-weight: 600;">{{ profileUser.username }}</span> but don't have an account? <a href="{% url 'register' %}">Register here.</a> Already have an account? <a href="{% url 'login' %}">Log In here.</a>
+            </div>
+        {% endif %}
+        </div>
+        <div class="card-footer text-muted">
+        Joined Network on <span style="font-weight: 600;">{{ profileUser.date_joined }}</span> and last seen on <span style="font-weight: 600;">{{ profileUser.last_login }}</span>
+        </div>
+    </div>
+    {% if userPosts %}
+        {% for p in userPosts %}
+        <div class="card mb-1">
+            <div class="card-body">
+                <div class="cardHeading-{{ p.id }}" style="display: flex; justify-content: space-between; vertical-align: middle;">
+                    <a href="javascript:void(0)" style="text-decoration: none; color: black; margin: 0px; vertical-align: middle;">
+                        <h5 class="card-title" style="font-weight: 600; margin: 0px;">{{ p.user.username }}</h5>
+                    </a>
+                    <h6 class="card-subtitle mb-2 text-muted" style="margin: 0px !important;">{{ p.created }}</h6>
+                </div>
+            <p class="card-text ml-3 mt-2" data-content="{{ p.id }}">{{ p.content }}</p>
+            <div class="iconGroup-{{ p.id }}">
+                <a href="javascript:void(0)" class="card-link ml-3">
+                    {% if userLikes|get_item:p.id %}
+                    <i class="fa fa-heart like" style="font-size:24px; color:red" data-postid="{{ p.id }}"></i>
+                    {% else %}
+                    <i class="fa fa-heart-o like" style="font-size:24px; color:red" data-postid="{{ p.id }}"></i>
+                    {% endif %}
+                </a>
+                {% if postLikesTotal|length > 0 %}
+                    <p style="font-weight: 500; display: inline;" id="{{ p.id }}">{{ postLikesTotal|get_item:p.id }}</p>
+                {%endif%}
+                {% if request.user.id == p.user.id %}
+                <a href="#" class="card-link ml-3 postEdit" id="postEdit" data-editid="{{ p.id }}"><i class="fa fa-edit" style="font-size: 24px;"></i></a>
+                {% endif %}
+            </div>
+            </div>
+        </div>
+        {% endfor %}
+        <div style="margin-top: 15px; margin-bottom: 50px;">
+            {% if previous != 0 %}
+            <a href="{% url 'profile' profileUser.id previous %}" class="btn btn-sm btn-primary" style="width: 100px; float: left;">Previous</a>
+            {% endif %}
+            {% if not userPosts|length < 10 %}
+            <a href="{% url 'profile' profileUser.id next %}" class="btn btn-sm btn-primary" style="width: 100px; float:right;">Next</a>
+            {% endif %}
+        </div>
+    {% else %}
+        This user has no posts.
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "network/layout.html" %}
+{% load static %}
+{% block head %}
+<script src="{% static 'network/index.js' %}"></script>
+<script src="{% static 'network/edit.js' %}"></script>
+<script src="{% static 'network/util.js' %}"></script>
+{% endblock %}
+{% block body %}
+    {% if posts %}
+        {% if user.is_authenticated %}
+        <div class="mt-3">
+            <h3>New Post</h3>
+            <form method="POST" id="newPostForm">
+                <textarea id="newPostContent" class="form-control" rows="3" maxlength="200" placeholder="Write a new post"></textarea>
+                <input type="submit" value="Post" class="btn btn-sm btn-primary flex-right mt-2" id="newPostSubmitBtn" style="width: 100px;">
+            </form>
+        </div>
+        {% endif %}
+        <h3 class="mb-3 mt-3" style="font-weight: 600;">Latest posts</h3>
+        <section id="latestPostsSection">
+            {% for p in posts %}
+            <div class="card mb-1">
+                <div class="card-body">
+                    <div class="cardHeading-{{ p.id }}" style="display: flex; justify-content: space-between; vertical-align: middle;">
+                        <a href="{% url 'profile' p.user.id %}" style="text-decoration: none; color: black; margin: 0px; vertical-align: middle;">
+                            <h5 class="card-title" style="font-weight: 600; margin: 0px;">{{ p.user.username }}</h5>
+                        </a>
+                        <h6 class="card-subtitle mb-2 text-muted" style="margin: 0px !important;">{{ p.created }}</h6>
+                    </div>
+                    <p class="card-text ml-3 mt-2" data-content="{{ p.id }}">{{ p.content }}</p>
+                    <div class="iconGroup-{{ p.id }}">
+                        <a href="javascript:void(0)" class="card-link ml-3">
+                        {% if userLikes|get_item:p.id %}
+                            <i class="fa fa-heart like" style="font-size:24px; color:red" data-postid="{{ p.id }}"></i>
+                        {% else %}
+                            <i class="fa fa-heart-o like" style="font-size:24px; color:red" data-postid="{{ p.id }}"></i>
+                        {% endif %}
+                        </a>
+                        {% if postLikesTotal|length > 0 %}
+                            <p style="font-weight: 500; display: inline;" id="{{ p.id }}">{{ postLikesTotal|get_item:p.id }}</p>
+                        {%endif%}
+                        {% if request.user.id == p.user.id %}
+                            <a href="javascript:void(0)" class="card-link ml-3 postEdit" id="postEdit" data-editid="{{ p.id }}"><i class="fa fa-edit" style="font-size: 24px;"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+        <div style="margin-top: 15px; margin-bottom: 50px;">
+            {% if previous != 0 %}
+            <a href="{% url 'index' previous %}" class="btn btn-sm btn-primary" style="width: 100px; float: left;">Previous</a>
+            {% endif %}
+            {% if not posts|length < 10 %}
+            <a href="{% url 'index' next %}" class="btn btn-sm btn-primary" style="width: 100px; float:right;">Next</a>
+            {% endif %}
+        </div>
+       
+    {% else %}
+          <div>No posts.</div>
+    {% endif %}
+
+{% endblock %}

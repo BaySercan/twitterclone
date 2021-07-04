@@ -11,7 +11,7 @@ from django.template.defaulttags import register
 from .models import User, Post, Like, Follow
 from django.views.decorators.csrf import csrf_exempt
 
-
+#below function is for template filtering, check out "like button" section on index, profile or following HTML files.
 @register.filter
 def get_item(dictionary, key):
     return dictionary.get(key)

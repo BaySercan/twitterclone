@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             ta = document.createElement('textarea');
 
-            ta.setAttribute("class", "form-control edit-post");
+            ta.setAttribute("class", "form-control edit-post mt-2");
             ta.setAttribute("rows", "3");
             ta.setAttribute("maxlength", "200")
 
